@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>EU AI Grants · Steamgraph</title>
 <style>
 @font-face {
@@ -15,97 +15,80 @@
 @import url('https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400&display=swap');
 
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --yellow: #fdf151;
-  --grey:   #656565;
-  --dark:   #222222;
-  --bg:     #ffffff;
-}
+:root { --yellow:#fdf151; --grey:#656565; --dark:#222222; --bg:#ffffff; }
+
+html { -webkit-text-size-adjust:100%; }
 
 body {
-  background: var(--bg);
-  color: var(--dark);
-  font-family: 'PT Sans', sans-serif;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: clamp(20px,5vw,60px) clamp(12px,4vw,32px) clamp(20px,5vw,60px);
+  background:var(--bg); color:var(--dark);
+  font-family:'PT Sans',sans-serif;
+  min-height:100vh;
+  display:flex; flex-direction:column; align-items:center;
+  padding:24px 16px 48px;
+  -webkit-tap-highlight-color:transparent;
 }
 
 /* ── HEADER ── */
 .header {
-  width: 100%; max-width: 800px; margin-bottom: 14px;
-  border-top: 3px solid var(--dark); padding-top: 20px;
-  display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start;
+  width:100%; max-width:800px; margin-bottom:14px;
+  border-top:3px solid var(--dark); padding-top:20px;
+  display:grid; grid-template-columns:1fr auto; gap:20px; align-items:start;
 }
 .eyebrow {
-  font-family: 'PT Sans', sans-serif;
-  font-size: clamp(9px,1.5vw,10px);
-  letter-spacing: .2em; text-transform: uppercase; color: var(--grey); margin-bottom: 10px;
+  font-size:clamp(9px,1.5vw,11px);
+  letter-spacing:.2em; text-transform:uppercase; color:var(--grey); margin-bottom:8px;
 }
 h1 {
-  font-family: 'Chaney', sans-serif; font-weight: normal;
-  font-size: clamp(18px,4vw,38px); line-height: 1.05;
-  text-transform: uppercase; color: var(--dark);
+  font-family:'Chaney',sans-serif; font-weight:normal;
+  font-size:clamp(20px,5vw,38px); line-height:1.05;
+  text-transform:uppercase; color:var(--dark);
 }
-h1 .trail { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 5px; }
+h1 .trail { text-decoration:underline; text-decoration-thickness:3px; text-underline-offset:5px; }
 .subtitle {
-  font-family: 'PT Sans', sans-serif;
-  font-size: clamp(11px,1.8vw,13px);
-  font-style: italic; color: var(--grey); line-height: 1.5;
-  max-width: 400px; margin-top: 10px;
+  font-size:clamp(12px,2vw,14px); font-style:italic; color:var(--grey); line-height:1.5; margin-top:8px;
 }
-.yblock { width: 44px; height: 44px; background: var(--yellow); flex-shrink: 0; align-self: start; margin-top: 6px; }
-
-/* legend removed */
+.yblock { width:40px; height:40px; background:var(--yellow); flex-shrink:0; align-self:start; margin-top:4px; }
 
 /* ── CHART ── */
-.chart-wrap {
-  width: 100%; max-width: 800px;
-  padding: clamp(6px,2vw,18px) 0;
-}
-#stream-svg {
-  display: block; width: 100%; overflow: visible; user-select: none;
-}
+.chart-wrap { width:100%; max-width:800px; padding:6px 0; }
+#stream-svg { display:block; width:100%; overflow:visible; user-select:none; touch-action:pan-y; }
 
-/* ── TOOLTIP ── */
+/* ── TOOLTIP ──
+   Mobile (≤540px): fixed bottom-centre panel
+   Desktop: follow cursor (set by JS)
+*/
 #tooltip {
-  position: fixed; pointer-events: none; z-index: 999; display: none;
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(22px) saturate(1.9);
-  -webkit-backdrop-filter: blur(22px) saturate(1.9);
-  border-radius: 14px;
-  padding: 14px 16px 12px; min-width: 210px;
-  box-shadow: 0 4px 24px rgba(0,0,0,.18), 0 1px 6px rgba(0,0,0,.10);
+  position:fixed; pointer-events:none; z-index:999; display:none;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(22px) saturate(2);
+  -webkit-backdrop-filter:blur(22px) saturate(2);
+  border-radius:14px;
+  padding:14px 16px 12px; min-width:210px;
+  box-shadow:0 8px 32px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.07);
 }
-.tt-cat {
-  font-family: 'Chaney', sans-serif; font-size: 10px;
-  text-transform: uppercase; color: var(--dark);
-  margin-bottom: 2px; line-height: 1.3;
+@media (max-width:540px) {
+  #tooltip {
+    left:50% !important; transform:translateX(-50%) !important;
+    bottom:20px !important; top:auto !important;
+    width:calc(100vw - 40px); max-width:340px;
+    background:rgba(255,255,255,0.92);
+  }
 }
-.tt-bar { height: 3px; border-radius: 2px; margin: 7px 0 10px; }
-.tt-row { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 5px; align-items: baseline; }
-.tt-lbl { font-size: 8px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); }
-.tt-val { font-family: 'PT Serif', serif; font-size: 18px; font-weight: 700; color: var(--dark); line-height: 1; }
-.tt-val.small { font-size: 13px; }
+.tt-cat { font-family:'Chaney',sans-serif; font-size:10px; text-transform:uppercase; color:var(--dark); margin-bottom:2px; line-height:1.3; }
+.tt-bar { height:3px; border-radius:2px; margin:7px 0 10px; }
+.tt-row { display:flex; justify-content:space-between; gap:16px; margin-bottom:5px; align-items:baseline; }
+.tt-lbl { font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--grey); }
+.tt-val { font-family:'PT Serif',serif; font-size:19px; font-weight:700; color:var(--dark); line-height:1; }
+.tt-val.small { font-size:14px; }
 
 /* ── INFO FOOTER ── */
-.info-footer {
-  width: 100%; max-width: 800px; margin-top: 2px;
-  border-top: 1px solid #e0e0e0; padding-top: 12px;
-}
-.info-footer p {
-  font-family: 'PT Sans', sans-serif;
-  font-size: clamp(9px,1.5vw,10px);
-  color: var(--grey); line-height: 1.65; margin-bottom: 4px;
-}
-.info-footer p strong { font-weight: 700; color: #444; }
+.info-footer { width:100%; max-width:800px; margin-top:6px; border-top:1px solid #e0e0e0; padding-top:12px; }
+.info-footer p { font-size:clamp(9px,1.5vw,11px); color:var(--grey); line-height:1.65; margin-bottom:4px; }
+.info-footer p strong { font-weight:700; color:#444; }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div>
     <div class="eyebrow">EU AI Grants · 2022–2025</div>
@@ -115,13 +98,10 @@ h1 .trail { text-decoration: underline; text-decoration-thickness: 3px; text-und
   <div class="yblock"></div>
 </div>
 
-
-<!-- CHART -->
 <div class="chart-wrap">
   <svg id="stream-svg"></svg>
 </div>
 
-<!-- TOOLTIP -->
 <div id="tooltip">
   <div class="tt-cat" id="tt-cat"></div>
   <div class="tt-bar" id="tt-bar"></div>
@@ -129,35 +109,30 @@ h1 .trail { text-decoration: underline; text-decoration-thickness: 3px; text-und
   <div class="tt-row"><span class="tt-lbl">Value (USD)</span><span class="tt-val" id="tt-val"></span></div>
 </div>
 
-<!-- INFO FOOTER -->
 <div class="info-footer">
-  <p><strong>Methodology:</strong> EC Award (USD) columns C, E, G, I from the Horizon Non-Exempt section of "3. Subcategory Analysis" tab. TOTAL and Uncategorised rows excluded. Grants may appear in multiple subcategories. USD conversion at 1.1816 EUR/USD.</p>
+  <p><strong>Methodology:</strong> Sum of EC Award (USD) across Horizon Non-Exempt, Digital Non-Exempt and Defence Non-Exempt. All Defence sub-sheet subcategories merged into "Defense related". Grants may appear in multiple subcategories. USD at 1.1816 EUR/USD.</p>
   <p><strong>Sources:</strong> European Commission grant databases via Open Future Foundation analysis, March 2025.</p>
-  <p style="margin-top:6px;color:#aaa;">Hover any band to see details.</p>
+  <p style="margin-top:6px;color:#aaa;">Tap or hover any band to see details.</p>
 </div>
 
 <script>
 // ── DATA ─────────────────────────────────────────────────────────────────
 const YEARS = [2022, 2023, 2024, 2025];
 
-// Ordered by total descending for visual impact
-// Horizon Non-Exempt only — sorted by total desc
+// Ordered by 2022 value: largest in centre, alternating outward to smallest at edges
 const CATS = [
-  // Ordered by 2022 value: largest in centre, alternating outward to smallest at edges
-  'NLP & Human-AI Interaction',           // rank 10 — outermost top
-  'Manufacturing & Industrial AI',        // rank 8
-  'Autonomous Systems & Robotics',        // rank 6
-  'Healthcare & Biomedical AI',           // rank 4
-  'Smart Infrastructure & Energy',        // rank 2
-  'Defense related',                      // rank 1 — centre (largest 2022)
-  'Data Analytics & ML Infrastructure',   // rank 3
-  'Ethics, Bias, Safety & Transparency',  // rank 5
-  'Cybersecurity & Data Privacy',         // rank 7
-  'Computer Vision & Imaging',            // rank 9 — outermost bottom
+  'NLP & Human-AI Interaction',
+  'Manufacturing & Industrial AI',
+  'Autonomous Systems & Robotics',
+  'Healthcare & Biomedical AI',
+  'Smart Infrastructure & Energy',
+  'Defense related',
+  'Data Analytics & ML Infrastructure',
+  'Ethics, Bias, Safety & Transparency',
+  'Cybersecurity & Data Privacy',
+  'Computer Vision & Imaging',
 ];
 
-// USD millions per year [2022, 2023, 2024, 2025] — Horizon Non-Exempt only
-// Defence Non-Exempt: all subcategories merged into Defence, Surveillance & Intelligence
 const RAW = {
   'Defense related':                      [1110.51, 1054.05, 595.98, 990.17],
   'Smart Infrastructure & Energy':        [ 823.86,  694.49, 520.18, 426.79],
@@ -171,7 +146,6 @@ const RAW = {
   'NLP & Human-AI Interaction':           [ 104.64,  147.29, 139.70, 134.98],
 };
 
-// Open Future palette: brand yellow + dark/grey scale + tonal extensions
 const PALETTE = {
   'Smart Infrastructure & Energy':        '#111111',
   'Data Analytics & ML Infrastructure':   '#2e2e2e',
@@ -185,284 +159,293 @@ const PALETTE = {
   'NLP & Human-AI Interaction':           '#cacaca',
 };
 
-// ── Streamgraph silhouette (wiggle) baseline ─────────────────────────
-function computeStreams() {
-  const n = CATS.length, m = YEARS.length;
-  const vals = CATS.map(c => RAW[c]); // [cat][year]
+// Full names for desktop; shortened for mobile
+const NAME_DESKTOP = {
+  'Defense related':                     'Defense related',
+  'Smart Infrastructure & Energy':       'Smart Infrastructure & Energy',
+  'Data Analytics & ML Infrastructure':  'Data Analytics & ML Infrastructure',
+  'Healthcare & Biomedical AI':          'Healthcare & Biomedical AI',
+  'Ethics, Bias, Safety & Transparency': 'Ethics, Bias, Safety & Transparency',
+  'Autonomous Systems & Robotics':       'Autonomous Systems & Robotics',
+  'Cybersecurity & Data Privacy':        'Cybersecurity & Data Privacy',
+  'Manufacturing & Industrial AI':       'Manufacturing & Industrial AI',
+  'Computer Vision & Imaging':           'Computer Vision & Imaging',
+  'NLP & Human-AI Interaction':          'NLP & Human-AI Interaction',
+};
+const NAME_MOBILE = {
+  'Defense related':                     'Defense',
+  'Smart Infrastructure & Energy':       'Smart Infra & Energy',
+  'Data Analytics & ML Infrastructure':  'Data Analytics & ML',
+  'Healthcare & Biomedical AI':          'Healthcare & Biomedical',
+  'Ethics, Bias, Safety & Transparency': 'Ethics & Safety',
+  'Autonomous Systems & Robotics':       'Autonomous Systems',
+  'Cybersecurity & Data Privacy':        'Cybersecurity',
+  'Manufacturing & Industrial AI':       'Manufacturing AI',
+  'Computer Vision & Imaging':           'Computer Vision',
+  'NLP & Human-AI Interaction':          'NLP & Human-AI',
+};
 
-  // Silhouette: baseline_i = -0.5 * Σ vals[c][i]
+// ── Streamgraph maths ────────────────────────────────────────────────
+function computeStreams() {
+  const vals = CATS.map(c => RAW[c]);
   const base = YEARS.map((_, yi) =>
     -0.5 * CATS.reduce((s, _, ci) => s + vals[ci][yi], 0)
   );
-
-  const streams = [];
-  const cumLo = [...base];
-
-  for (let ci = 0; ci < n; ci++) {
+  const streams = [], cumLo = [...base];
+  for (let ci = 0; ci < CATS.length; ci++) {
     const lo = [...cumLo];
     const hi = cumLo.map((v, yi) => v + vals[ci][yi]);
     streams.push({ cat: CATS[ci], lo, hi, vals: vals[ci] });
-    for (let yi = 0; yi < m; yi++) cumLo[yi] = hi[yi];
+    for (let yi = 0; yi < YEARS.length; yi++) cumLo[yi] = hi[yi];
   }
   return streams;
 }
 
-// ── Cubic Catmull-Rom smooth path ────────────────────────────────────
 function catmullPath(pts) {
-  if (pts.length < 2) return `M${pts[0][0]} ${pts[0][1]}`;
   let d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
   for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[Math.max(i-1, 0)];
-    const p1 = pts[i];
-    const p2 = pts[i+1];
-    const p3 = pts[Math.min(i+2, pts.length-1)];
-    const tension = 0.2;
-    const cp1x = p1[0] + (p2[0]-p0[0]) * tension;
-    const cp1y = p1[1] + (p2[1]-p0[1]) * tension;
-    const cp2x = p2[0] - (p3[0]-p1[0]) * tension;
-    const cp2y = p2[1] - (p3[1]-p1[1]) * tension;
-    d += ` C${cp1x.toFixed(1)} ${cp1y.toFixed(1)},${cp2x.toFixed(1)} ${cp2y.toFixed(1)},${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+    const p0=pts[Math.max(i-1,0)], p1=pts[i], p2=pts[i+1], p3=pts[Math.min(i+2,pts.length-1)];
+    const t=0.2;
+    const cp1x=p1[0]+(p2[0]-p0[0])*t, cp1y=p1[1]+(p2[1]-p0[1])*t;
+    const cp2x=p2[0]-(p3[0]-p1[0])*t, cp2y=p2[1]-(p3[1]-p1[1])*t;
+    d+=` C${cp1x.toFixed(1)} ${cp1y.toFixed(1)},${cp2x.toFixed(1)} ${cp2y.toFixed(1)},${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
   }
   return d;
 }
 
 function buildBand(xs, hiY, loY) {
-  const topPts = xs.map((x, i) => [x, hiY[i]]);
-  const botPts = xs.map((x, i) => [x, loY[i]]).reverse();
-  const dTop = catmullPath(topPts);
-  const dBot = catmullPath(botPts).replace(/^M[^ ]+ [^ ]+/, '');
-  const join = `L${botPts[0][0].toFixed(1)} ${botPts[0][1].toFixed(1)}`;
-  return dTop + join + dBot + 'Z';
+  const bot = xs.map((x,i)=>[x,loY[i]]).reverse();
+  return catmullPath(xs.map((x,i)=>[x,hiY[i]])) +
+    `L${bot[0][0].toFixed(1)} ${bot[0][1].toFixed(1)}` +
+    catmullPath(bot).replace(/^M[^ ]+ [^ ]+/,'') + 'Z';
 }
 
-// ── Render ────────────────────────────────────────────────────────────
+// ── State ────────────────────────────────────────────────────────────
 const tooltip = document.getElementById('tooltip');
 const pathMap = {};
+let _W, _PL, _cW;
 
+const MB = () => window.innerWidth <= 540;
+
+// ── Render ───────────────────────────────────────────────────────────
 function render() {
-  const ns = 'http://www.w3.org/2000/svg';
+  const ns  = 'http://www.w3.org/2000/svg';
   const svg = document.getElementById('stream-svg');
   while (svg.firstChild) svg.removeChild(svg.firstChild);
   Object.keys(pathMap).forEach(k => delete pathMap[k]);
 
-  // 40% taller chart: was 400, now 560
-  const W = 700, H = 560;
-  // More right indent so 2025 label is fully visible
-  const PL = 14, PR = 80, PT = 48, PB = 52;
-  const cW = W - PL - PR, cH = H - PT - PB;
+  const mb = MB();
+
+  // Dimensions
+  const W  = mb ? 360  : 700;
+  const H  = mb ? 560  : 560;
+  const PL = mb ? 10   : 14;
+  const PR = mb ? 56   : 80;   // right indent for 2025 label
+  const PT = mb ? 52   : 48;   // top room for total label
+  const PB = mb ? 50   : 52;
+  const cW = W - PL - PR;
+  const cH = H - PT - PB;
+
+  _W = W; _PL = PL; _cW = cW;
 
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('height', H);
 
   const streams = computeStreams();
 
-  // Y extent
-  let yMin = Infinity, yMax = -Infinity;
-  streams.forEach(s => {
-    s.lo.forEach(v => { if (v < yMin) yMin = v; });
-    s.hi.forEach(v => { if (v > yMax) yMax = v; });
+  // Y scale
+  let yMin=Infinity, yMax=-Infinity;
+  streams.forEach(s=>{
+    s.lo.forEach(v=>{ if(v<yMin)yMin=v; });
+    s.hi.forEach(v=>{ if(v>yMax)yMax=v; });
   });
-  const ySpan  = yMax - yMin;
-  const yPad   = ySpan * 0.045;
-  const yTot   = ySpan + yPad * 2;
-  const yOff   = yMin - yPad;
+  const ySpan=yMax-yMin, yPad=ySpan*0.045;
+  function sy(v){ return PT+(1-(v-(yMin-yPad))/(ySpan+yPad*2))*cH; }
 
-  function sy(v) { return PT + (1 - (v - yOff) / yTot) * cH; }
+  const xs = YEARS.map((_,i)=>PL+i*(cW/(YEARS.length-1)));
 
-  // X positions
-  const xs = YEARS.map((_, i) => PL + i * (cW / (YEARS.length - 1)));
-  const midY = sy(0);
-
-  // ── 1. Vertical tick lines — drawn FIRST so streams sit on top ──
-  YEARS.forEach((year, i) => {
-    const x   = xs[i];
-    const gap = 7;
-    const tickTop = PT - 22;
-    const tickBot = H - PB + 30;
-
-    const tick = document.createElementNS(ns, 'line');
-    tick.setAttribute('x1', x); tick.setAttribute('y1', tickTop);
-    tick.setAttribute('x2', x); tick.setAttribute('y2', tickBot);
-    tick.setAttribute('stroke', '#222');
-    tick.setAttribute('stroke-width', '0.5');
-    tick.setAttribute('pointer-events', 'none');
-    svg.appendChild(tick);
+  // ── 1. Tick lines — behind streams ──────────────────────────────
+  YEARS.forEach((_,i)=>{
+    const x=xs[i];
+    const ln=document.createElementNS(ns,'line');
+    ln.setAttribute('x1',x); ln.setAttribute('y1',PT-26);
+    ln.setAttribute('x2',x); ln.setAttribute('y2',H-PB+32);
+    ln.setAttribute('stroke','#222'); ln.setAttribute('stroke-width','0.5');
+    ln.setAttribute('pointer-events','none');
+    svg.appendChild(ln);
   });
 
   // ── 2. Streams ──────────────────────────────────────────────────
-  streams.forEach(s => {
-    const hiY = s.hi.map(sy);
-    const loY = s.lo.map(sy);
-    const d   = buildBand(xs, hiY, loY);
-    const col = PALETTE[s.cat];
+  streams.forEach(s=>{
+    const hiY=s.hi.map(sy), loY=s.lo.map(sy);
+    const col=PALETTE[s.cat];
 
-    const path = document.createElementNS(ns, 'path');
-    path.setAttribute('d', d);
+    const path=document.createElementNS(ns,'path');
+    path.setAttribute('d', buildBand(xs,hiY,loY));
     path.setAttribute('fill', col);
-    path.setAttribute('stroke', '#fff');
-    path.setAttribute('stroke-width', '0.7');
-    path.style.opacity    = '0.92';
-    path.style.cursor     = 'pointer';
-    path.style.transition = 'opacity .18s';
+    path.setAttribute('stroke','#fff');
+    path.setAttribute('stroke-width', mb?'0.5':'0.7');
+    path.style.opacity='0.92'; path.style.cursor='pointer';
+    path.style.transition='opacity .18s';
 
-    path.addEventListener('mouseenter', () => setActive(s.cat));
-    path.addEventListener('mouseleave', () => { clearActive(); tooltip.style.display = 'none'; });
-    path.addEventListener('mousemove',  e  => showTip(e, s, col));
+    // Mouse
+    path.addEventListener('mouseenter',()=>setActive(s.cat));
+    path.addEventListener('mouseleave',()=>{ clearActive(); tooltip.style.display='none'; });
+    path.addEventListener('mousemove', e=>showTip(e.clientX, e.clientY, s, col));
+
+    // Touch
+    path.addEventListener('touchstart', e=>{
+      e.preventDefault();
+      setActive(s.cat);
+      showTip(e.touches[0].clientX, e.touches[0].clientY, s, col);
+    },{passive:false});
+    path.addEventListener('touchend',()=>{
+      clearActive();
+      setTimeout(()=>{ tooltip.style.display='none'; },2000);
+    });
 
     svg.appendChild(path);
-    pathMap[s.cat] = path;
+    pathMap[s.cat]=path;
   });
 
-  // ── 3. Category labels between 2022 and 2023 ────────────────────
-  // Position: x = midpoint of xs[0]..xs[1], angled along stream slope
-  const labelX = (xs[0] + xs[1]) / 2;
+  // ── 3. Category labels — left-anchored from a safe start X ─────────
+  // Use text-anchor:start so text only extends rightward from labelStartX.
+  // labelStartX = xs[0] + a small left indent, so nothing bleeds off the left edge.
+  // On mobile we push a bit more right (40% of gap) for comfort; desktop 20%.
+  const labelStartX = mb
+    ? xs[0] + (xs[1] - xs[0]) * 0.40   // mobile: 40% into the 2022→2023 gap
+    : xs[0] + (xs[1] - xs[0]) * 0.20;  // desktop: 20% into the gap
 
-  streams.forEach(s => {
-    const col  = PALETTE[s.cat];
-    const hiY  = s.hi.map(sy);
-    const loY  = s.lo.map(sy);
+  const nameMap = mb ? NAME_MOBILE : NAME_DESKTOP;
+  const fsMin = mb ? 8  : 8;
+  const fsMax = mb ? 13 : 13;
 
-    // midpoint of band at label column position (interpolate at labelX)
-    const t    = (labelX - xs[0]) / (xs[1] - xs[0]); // 0..1 between col 0 and 1
+  const labelG = document.createElementNS(ns,'g');
+
+  streams.forEach(s=>{
+    const col=PALETTE[s.cat], hiY=s.hi.map(sy), loY=s.lo.map(sy);
+
+    // Interpolate band height at labelStartX
+    const t = (labelStartX - xs[0]) / (xs[1] - xs[0]);
     const hiAt = hiY[0] + t * (hiY[1] - hiY[0]);
     const loAt = loY[0] + t * (loY[1] - loY[0]);
     const midAt = (hiAt + loAt) / 2;
     const bandH = loAt - hiAt;
 
-    if (bandH < 8) return; // too thin
+    if(bandH < (mb ? 10 : 8)) return;
 
-    // Angle: from stream midpoint at xs[0] to xs[1]
-    const m0 = (hiY[0] + loY[0]) / 2;
-    const m1 = (hiY[1] + loY[1]) / 2;
-    const angleDeg = Math.atan2(m1 - m0, xs[1] - xs[0]) * 180 / Math.PI;
+    // Angle: slope of stream midline from xs[0] to xs[1]
+    const m0=(hiY[0]+loY[0])/2, m1=(hiY[1]+loY[1])/2;
+    const ang=Math.atan2(m1-m0, xs[1]-xs[0])*180/Math.PI;
 
-    // Short names
-    const name = s.cat
-      .replace('Data Analytics & ML Infrastructure', 'Data Analytics & ML')
-      .replace('Ethics, Bias, Safety & Transparency', 'Ethics & Transparency')
-      .replace('Smart Infrastructure & Energy', 'Smart Infrastructure')
-      .replace('Autonomous Systems & Robotics', 'Autonomous Systems')
-      .replace('Manufacturing & Industrial AI', 'Manufacturing AI')
-      .replace('Cybersecurity & Data Privacy', 'Cybersecurity')
-      .replace('NLP & Human-AI Interaction', 'NLP & Human-AI');
+    const fs = Math.min(Math.max(bandH * (mb ? 0.24 : 0.26), fsMin), fsMax);
+    const textCol = col==='#fdf151' ? '#333' : '#fff';
 
-    // Font size: scales with band height, capped
-    const fontSize = Math.min(Math.max(bandH * 0.26, 7.5), 13);
-    const textCol  = col === '#fdf151' ? '#333333' : '#ffffff';
-
-    const txt = document.createElementNS(ns, 'text');
+    const txt=document.createElementNS(ns,'text');
     txt.setAttribute('x', 0);
     txt.setAttribute('y', 0);
-    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('text-anchor', 'start');       // starts at labelStartX, extends right
     txt.setAttribute('dominant-baseline', 'middle');
-    txt.setAttribute('font-family', 'PT Sans, sans-serif');
-    txt.setAttribute('font-size', fontSize);
-    txt.setAttribute('font-weight', '700');
+    txt.setAttribute('font-family','PT Sans, sans-serif');
+    txt.setAttribute('font-size', fs);
+    txt.setAttribute('font-weight','700');
     txt.setAttribute('fill', textCol);
-    txt.setAttribute('opacity', '0.9');
-    txt.setAttribute('pointer-events', 'none');
-    txt.setAttribute('transform', `translate(${labelX.toFixed(1)},${midAt.toFixed(1)}) rotate(${angleDeg.toFixed(2)})`);
-    txt.textContent = name;
-    svg.appendChild(txt);
+    txt.setAttribute('opacity','0.92');
+    txt.setAttribute('pointer-events','none');
+    // translate to (labelStartX, midAt) then rotate — text starts at that point
+    txt.setAttribute('transform',`translate(${labelStartX.toFixed(1)},${midAt.toFixed(1)}) rotate(${ang.toFixed(2)})`);
+    txt.textContent = nameMap[s.cat] || s.cat;
+    labelG.appendChild(txt);
   });
 
-  // ── 4. Axis labels (above + below tick) — drawn LAST on top ─────
-  YEARS.forEach((year, i) => {
-    const x   = xs[i];
-    const gap = 7;
-    const yearTotal = CATS.reduce((sum, c) => sum + RAW[c][i], 0);
+  svg.appendChild(labelG);
 
-    // "Total per year" label — small grey, above the value, only for first year
-    if (i === 0) {
-      const hdr = document.createElementNS(ns, 'text');
-      hdr.setAttribute('x', x + gap);
-      hdr.setAttribute('y', PT - 24);
-      hdr.setAttribute('text-anchor', 'start');
-      hdr.setAttribute('dominant-baseline', 'auto');
-      hdr.setAttribute('font-family', 'PT Sans, sans-serif');
-      hdr.setAttribute('font-size', '9');
-      hdr.setAttribute('letter-spacing', '0.12em');
-      hdr.setAttribute('fill', '#999');
-      hdr.setAttribute('pointer-events', 'none');
-      hdr.textContent = 'TOTAL PER YEAR';
+  // ── 4. Axis labels above + below ────────────────────────────────
+  const gap=7;
+  const fTot = mb ? 17 : 15;
+  const fYr  = mb ? 15 : 13;
+  const fHdr = mb ? 10 : 9;
+
+  YEARS.forEach((year,i)=>{
+    const x=xs[i];
+    const yTotal=CATS.reduce((sum,c)=>sum+RAW[c][i],0);
+
+    // "TOTAL PER YEAR" — first column only
+    if(i===0){
+      const hdr=document.createElementNS(ns,'text');
+      hdr.setAttribute('x',x+gap); hdr.setAttribute('y',PT-28);
+      hdr.setAttribute('text-anchor','start');
+      hdr.setAttribute('font-family','PT Sans, sans-serif');
+      hdr.setAttribute('font-size',fHdr);
+      hdr.setAttribute('letter-spacing','0.12em');
+      hdr.setAttribute('fill','#999');
+      hdr.setAttribute('pointer-events','none');
+      hdr.textContent='TOTAL PER YEAR';
       svg.appendChild(hdr);
     }
 
-    // Total value ABOVE — PT Sans bold, larger
-    const tot = document.createElementNS(ns, 'text');
-    tot.setAttribute('x', x + gap);
-    tot.setAttribute('y', PT - 8);
-    tot.setAttribute('text-anchor', 'start');
-    tot.setAttribute('dominant-baseline', 'auto');
-    tot.setAttribute('font-family', 'PT Sans, sans-serif');
-    tot.setAttribute('font-size', '15');
-    tot.setAttribute('font-weight', '700');
-    tot.setAttribute('fill', '#222');
-    tot.setAttribute('pointer-events', 'none');
-    tot.textContent = '$' + (yearTotal / 1000).toFixed(1) + 'B';
+    // Total value $XB
+    const tot=document.createElementNS(ns,'text');
+    tot.setAttribute('x',x+gap); tot.setAttribute('y',PT-10);
+    tot.setAttribute('text-anchor','start');
+    tot.setAttribute('font-family','PT Sans, sans-serif');
+    tot.setAttribute('font-size',fTot); tot.setAttribute('font-weight','700');
+    tot.setAttribute('fill','#222'); tot.setAttribute('pointer-events','none');
+    tot.textContent='$'+(yTotal/1000).toFixed(1)+'B';
     svg.appendChild(tot);
 
-    // Year label BELOW — PT Sans bold
-    const lbl = document.createElementNS(ns, 'text');
-    lbl.setAttribute('x', x + gap);
-    lbl.setAttribute('y', H - PB + 22);
-    lbl.setAttribute('text-anchor', 'start');
-    lbl.setAttribute('font-family', 'PT Sans, sans-serif');
-    lbl.setAttribute('font-size', '13');
-    lbl.setAttribute('font-weight', '700');
-    lbl.setAttribute('fill', '#222');
-    lbl.setAttribute('pointer-events', 'none');
-    lbl.textContent = year;
+    // Year label below
+    const lbl=document.createElementNS(ns,'text');
+    lbl.setAttribute('x',x+gap); lbl.setAttribute('y',H-PB+24);
+    lbl.setAttribute('text-anchor','start');
+    lbl.setAttribute('font-family','PT Sans, sans-serif');
+    lbl.setAttribute('font-size',fYr); lbl.setAttribute('font-weight','700');
+    lbl.setAttribute('fill','#222'); lbl.setAttribute('pointer-events','none');
+    lbl.textContent=year;
     svg.appendChild(lbl);
   });
-
-  // expose helpers for showTip
-  window._xs = xs; window._cW = cW; window._W = W; window._PL = PL;
-  window._sy = sy; window._streams = streams; window._midY = midY;
 }
 
-function setActive(cat) {
-  Object.entries(pathMap).forEach(([c, p]) => {
-    p.style.opacity = c === cat ? '1' : '0.07';
-  });
+// ── Highlight ────────────────────────────────────────────────────────
+function setActive(cat){
+  Object.entries(pathMap).forEach(([c,p])=>{ p.style.opacity=c===cat?'1':'0.07'; });
+}
+function clearActive(){
+  Object.values(pathMap).forEach(p=>{ p.style.opacity='0.92'; });
 }
 
-function clearActive() {
-  Object.values(pathMap).forEach(p => { p.style.opacity = '0.92'; });
-}
-
-function showTip(e, s, col) {
+// ── Tooltip ──────────────────────────────────────────────────────────
+function showTip(clientX, clientY, s, col){
   const svg  = document.getElementById('stream-svg');
   const rect = svg.getBoundingClientRect();
-  const scale = rect.width / 700;
-  const mx   = (e.clientX - rect.left) / scale - window._PL;
-  const frac = Math.min(Math.max(mx / window._cW, 0), 1);
-  const yi   = Math.round(frac * (YEARS.length - 1));
-  const year = YEARS[yi];
-  const val  = s.vals[yi];
-  const yearTotal = CATS.reduce((sum, c) => sum + RAW[c][yi], 0);
+  const scale= rect.width / _W;
+  const mx   = (clientX - rect.left)/scale - _PL;
+  const yi   = Math.round(Math.min(Math.max(mx/_cW,0),1)*(YEARS.length-1));
 
-  document.getElementById('tt-cat').textContent   = s.cat;
-  document.getElementById('tt-bar').style.background = col;
-  document.getElementById('tt-year').textContent  = year;
-  document.getElementById('tt-val').textContent   = '$' + val.toFixed(0) + 'M';
-  tooltip.style.display = 'block';
+  document.getElementById('tt-cat').textContent      = s.cat;
+  document.getElementById('tt-bar').style.background = PALETTE[s.cat];
+  document.getElementById('tt-year').textContent     = YEARS[yi];
+  document.getElementById('tt-val').textContent      = '$'+s.vals[yi].toFixed(0)+'M';
+  tooltip.style.display='block';
 
-  const tw = tooltip.offsetWidth, th = tooltip.offsetHeight;
-  let x = e.clientX + 16, y = e.clientY - th / 2;
-  if (x + tw > window.innerWidth - 8) x = e.clientX - tw - 16;
-  if (y < 8) y = 8;
-  if (y + th > window.innerHeight - 8) y = window.innerHeight - th - 8;
-  tooltip.style.left = x + 'px';
-  tooltip.style.top  = y + 'px';
+  // Desktop: follow cursor. Mobile: CSS handles bottom-centre.
+  if(!MB()){
+    const tw=tooltip.offsetWidth, th=tooltip.offsetHeight;
+    let x=clientX+16, y=clientY-th/2;
+    if(x+tw>window.innerWidth-8)  x=clientX-tw-16;
+    if(y<8)                        y=8;
+    if(y+th>window.innerHeight-8)  y=window.innerHeight-th-8;
+    tooltip.style.bottom='auto';
+    tooltip.style.transform='none';
+    tooltip.style.left=x+'px';
+    tooltip.style.top=y+'px';
+    tooltip.style.width='auto';
+  }
 }
 
-// Legend removed — categories labelled directly on chart
-
 render();
-
 let _rt;
-window.addEventListener('resize', () => { clearTimeout(_rt); _rt = setTimeout(render, 120); });
+window.addEventListener('resize',()=>{ clearTimeout(_rt); _rt=setTimeout(render,120); });
 </script>
 </body>
 </html>
