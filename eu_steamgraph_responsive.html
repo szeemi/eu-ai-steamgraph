@@ -341,19 +341,42 @@ function render() {
     path.addEventListener('mouseleave', () => { clearActive(); });
     path.addEventListener('mousemove',  e  => showTipMouse(e, s, col));
 
-    // Touch
-    path.addEventListener('touchstart', e => {
-      e.preventDefault();
-      setActive(s.cat);
-      showTipTouch(e.touches[0].clientX, s, col);
-    }, {passive:false});
-    path.addEventListener('touchend', () => {
-      clearActive();
-    });
+    // Touch — touchstart/touchmove handled globally on SVG (see below)
+    path.addEventListener('touchend', () => { clearActive(); });
 
+    path._streamCat = s;
+    path._streamCol = col;
     svg.appendChild(path);
     pathMap[s.cat] = path;
   });
+
+  // ── Global SVG touch handler — enables sliding between bands ──────
+  // touchmove always fires on the element where touch started, so we use
+  // elementFromPoint to find the actual band under the finger.
+  function handleSvgTouch(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    // Temporarily hide pointer-events to find element underneath
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    // Walk up to find the path element
+    let target = el;
+    while (target && target !== svg) {
+      if (target._streamCat) {
+        const s   = target._streamCat;
+        const col = target._streamCol;
+        setActive(s.cat);
+        updateInlineLabels(s, touch.clientX);
+        return;
+      }
+      target = target.parentElement;
+    }
+    // Finger moved off all bands — clear
+    clearActive();
+  }
+
+  svg.addEventListener('touchstart', handleSvgTouch, {passive:false});
+  svg.addEventListener('touchmove',  handleSvgTouch, {passive:false});
+  svg.addEventListener('touchend',   () => { clearActive(); }, {passive:false});
 
   // ── 3. Category labels between 2022 and 2023 ─────────────────
   // Mobile: anchor near xs[0] + small inset so text grows right without
