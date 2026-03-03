@@ -47,12 +47,12 @@ body {
 }
 h1 {
   font-family: 'Chaney', sans-serif; font-weight: normal;
-  font-size: clamp(20px,5vw,42px); line-height: 1.05;
+  font-size: clamp(28px,7vw,42px); line-height: 1.05;
   text-transform: uppercase; color: var(--dark);
 }
 h1 .trail { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 5px; }
 .subtitle {
-  font-size: clamp(12px,2vw,14px);
+  font-size: clamp(15px,2vw,14px);
   font-style: italic; color: var(--grey); line-height: 1.5; max-width: 320px; margin-top: 12px;
 }
 .yblock {
@@ -122,10 +122,7 @@ h1 .trail { text-decoration: underline; text-decoration-thickness: 3px; text-und
 }
 .info-footer p strong { font-weight: 700; color: #444; }
 
-/* Mobile extra bottom padding so tooltip doesn't overlap footer */
-@media (max-width: 540px) {
-  body { padding-bottom: 100px; }
-}
+
 </style>
 </head>
 <body>
@@ -143,12 +140,7 @@ h1 .trail { text-decoration: underline; text-decoration-thickness: 3px; text-und
   <svg id="stream-svg"></svg>
 </div>
 
-<div id="tooltip">
-  <div class="tt-cat" id="tt-cat"></div>
-  <div class="tt-bar" id="tt-bar"></div>
-  <div class="tt-row"><span class="tt-lbl">Year</span><span class="tt-val small" id="tt-year"></span></div>
-  <div class="tt-row"><span class="tt-lbl">Value (USD)</span><span class="tt-val" id="tt-val"></span></div>
-</div>
+
 
 <div class="info-footer">
   <p><strong>Methodology:</strong> Sum of EC Award (USD) across Horizon Non-Exempt, Digital Non-Exempt and Defence Non-Exempt. All Defence sub-sheet subcategories merged into "Defense related". Grants may appear in multiple subcategories. USD at 1.1816 EUR/USD.</p>
@@ -271,7 +263,6 @@ function buildBand(xs, hiY, loY) {
 }
 
 // ── State ────────────────────────────────────────────────────────────
-const tooltip = document.getElementById('tooltip');
 const pathMap = {};
 let _xs, _cW, _W, _PL;
 
@@ -289,18 +280,18 @@ function render() {
   const H   = mb ? 580  : 560;   // mobile taller for label room
   const PL  = mb ? 10   : 14;
   const PR  = mb ? 56   : 80;    // right indent keeps 2025 label in view
-  const PT  = mb ? 56   : 48;    // top room for total value + header label
+  const PT  = mb ? 64   : 56;    // top room for total value + header label
   const PB  = mb ? 50   : 52;
   const cW  = W - PL - PR;
   const cH  = H - PT - PB;
 
   // Font sizes
-  const fHdr   = mb ? 11  : 9;   // "TOTAL PER YEAR" micro label
-  const fTotal = mb ? 18  : 15;  // $X.XB value
-  const fYear  = mb ? 15  : 13;  // year label
-  const fLblMin= mb ? 9.5 : 7.5; // min category label font size
-  const fLblMax= mb ? 16  : 13;  // max category label font size
-  const fLblK  = mb ? 0.30: 0.26;// label font = bandH * fLblK
+  const fHdr   = mb ? 10  : 9;   // "TOTAL PER YEAR" micro label
+  const fTotal = mb ? 14  : 15;  // X.XB value
+  const fYear  = mb ? 12  : 13;  // year label
+  const fLblMin= mb ? 7.5 : 7.5; // min category label font size
+  const fLblMax= mb ? 12  : 13;  // max category label font size
+  const fLblK  = mb ? 0.24: 0.26;// label font = bandH * fLblK
 
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('height',  H);
@@ -347,7 +338,7 @@ function render() {
 
     // Mouse
     path.addEventListener('mouseenter', () => setActive(s.cat));
-    path.addEventListener('mouseleave', () => { clearActive(); tooltip.style.display='none'; });
+    path.addEventListener('mouseleave', () => { clearActive(); });
     path.addEventListener('mousemove',  e  => showTipMouse(e, s, col));
 
     // Touch
@@ -358,7 +349,6 @@ function render() {
     }, {passive:false});
     path.addEventListener('touchend', () => {
       clearActive();
-      setTimeout(() => { tooltip.style.display='none'; }, 2000);
     });
 
     svg.appendChild(path);
@@ -412,36 +402,43 @@ function render() {
 
   // ── 4. Axis labels — above and below tick lines ───────────────
   const gap = 7;
+  // Larger fonts for header row
+  const fHdr2   = mb ? 12 : 13;   // "TOTAL PER YEAR" / subcategory label
+  const fTotal2 = mb ? 16 : 19;   // X.XB value
+
   YEARS.forEach((year, i) => {
     const x         = xs[i];
     const yearTotal = CATS.reduce((sum,c) => sum+RAW[c][i], 0);
 
-    // "TOTAL PER YEAR" micro header — first column only
+    // Header label — "TOTAL PER YEAR" (replaced on hover with subcategory name)
+    // Only draw for first column; we use a shared SVG <text> referenced by id
     if (i === 0) {
       const hdr = document.createElementNS(ns,'text');
+      hdr.setAttribute('id','lbl-hdr');
       hdr.setAttribute('x', x+gap);
-      hdr.setAttribute('y', PT-30);
+      hdr.setAttribute('y', PT-38);
       hdr.setAttribute('text-anchor','start');
       hdr.setAttribute('font-family','PT Sans, sans-serif');
-      hdr.setAttribute('font-size', fHdr);
-      hdr.setAttribute('letter-spacing','0.12em');
-      hdr.setAttribute('fill','#999');
+      hdr.setAttribute('font-size', fHdr2);
+      hdr.setAttribute('letter-spacing','0.10em');
+      hdr.setAttribute('fill','#222');
       hdr.setAttribute('pointer-events','none');
-      hdr.textContent = 'TOTAL PER YEAR';
+      hdr.textContent = 'TOTAL PER YEAR ($)';
       svg.appendChild(hdr);
     }
 
-    // Total value ($X.XB)
+    // Total value per year — replaced on hover with subcategory value
     const tot = document.createElementNS(ns,'text');
+    tot.setAttribute('id', `lbl-val-${i}`);
     tot.setAttribute('x', x+gap);
     tot.setAttribute('y', PT-11);
     tot.setAttribute('text-anchor','start');
     tot.setAttribute('font-family','PT Sans, sans-serif');
-    tot.setAttribute('font-size', fTotal);
+    tot.setAttribute('font-size', fTotal2);
     tot.setAttribute('font-weight','700');
     tot.setAttribute('fill','#222');
     tot.setAttribute('pointer-events','none');
-    tot.textContent = '$'+(yearTotal/1000).toFixed(1)+'B';
+    tot.textContent = (yearTotal/1000).toFixed(1)+'B';
     svg.appendChild(tot);
 
     // Year label below
@@ -458,7 +455,11 @@ function render() {
     svg.appendChild(lbl);
   });
 
-  // Store for tooltip hit-testing
+  // Store year totals for reset
+  window._yearTotals = YEARS.map((_,i) => CATS.reduce((sum,c)=>sum+RAW[c][i],0));
+  window._fTotal2 = fTotal2;
+
+  // Store for hit-testing
   _xs=xs; _cW=cW; _W=W; _PL=PL;
 }
 
@@ -470,47 +471,62 @@ function setActive(cat) {
 }
 function clearActive() {
   Object.values(pathMap).forEach(p => { p.style.opacity='0.92'; });
+  // Restore header label and year totals
+  const hdr = document.getElementById('lbl-hdr');
+  if (hdr) {
+    hdr.textContent = 'TOTAL PER YEAR ($)';
+    hdr.setAttribute('fill','#222');
+    hdr.setAttribute('letter-spacing','0.10em');
+  }
+  YEARS.forEach((_,i) => {
+    const el = document.getElementById(`lbl-val-${i}`);
+    if (el) {
+      el.textContent = (window._yearTotals[i]/1000).toFixed(1)+'B';
+      el.setAttribute('fill','#222');
+    }
+  });
 }
 
-// ── Shared tooltip content filler ────────────────────────────────────
-function fillTooltip(s, col, clientX) {
+// ── Get year index from clientX ───────────────────────────────────────
+function getYi(clientX) {
   const svg   = document.getElementById('stream-svg');
   const rect  = svg.getBoundingClientRect();
   const scale = rect.width / _W;
   const mx    = (clientX - rect.left) / scale - _PL;
-  const yi    = Math.round(Math.min(Math.max(mx/_cW,0),1) * (YEARS.length-1));
-
-  document.getElementById('tt-cat').textContent      = s.cat;
-  document.getElementById('tt-bar').style.background = col;
-  document.getElementById('tt-year').textContent     = YEARS[yi];
-  document.getElementById('tt-val').textContent      = '$' + s.vals[yi].toFixed(0) + 'M';
-  tooltip.style.display = 'block';
-  return yi;
+  return Math.round(Math.min(Math.max(mx/_cW,0),1) * (YEARS.length-1));
 }
 
-// ── Mouse tooltip (desktop) — follows cursor ──────────────────────────
-function showTipMouse(e, s, col) {
-  fillTooltip(s, col, e.clientX);
-  if (!isMob()) {
-    const tw=tooltip.offsetWidth, th=tooltip.offsetHeight;
-    let x=e.clientX+16, y=e.clientY-th/2;
-    if (x+tw > window.innerWidth-8)  x = e.clientX-tw-16;
-    if (y < 8)                        y = 8;
-    if (y+th > window.innerHeight-8)  y = window.innerHeight-th-8;
-    // Reset mobile styles
-    tooltip.style.bottom    = 'auto';
-    tooltip.style.transform = 'none';
-    tooltip.style.left      = x+'px';
-    tooltip.style.top       = y+'px';
-    tooltip.style.width     = 'auto';
+// ── Update inline SVG labels on hover ────────────────────────────────
+function updateInlineLabels(s, clientX) {
+  const yi  = getYi(clientX);
+  const val = s.vals[yi];
+
+  // Replace header "TOTAL PER YEAR" with subcategory name
+  const hdr = document.getElementById('lbl-hdr');
+  if (hdr) {
+    hdr.textContent = s.cat.toUpperCase() + ' ($)';
+    hdr.setAttribute('fill','#555');
+    hdr.setAttribute('letter-spacing','0.05em');
   }
-  // On mobile the CSS @media rule handles positioning
+
+  // Replace each year's total with this subcategory's value — same black all columns
+  YEARS.forEach((_,i) => {
+    const el = document.getElementById(`lbl-val-${i}`);
+    if (el) {
+      el.textContent = s.vals[i].toFixed(0)+'M';
+      el.setAttribute('fill','#222');
+    }
+  });
 }
 
-// ── Touch tooltip (mobile) ────────────────────────────────────────────
+// ── Mouse (desktop + mobile pointer) ─────────────────────────────────
+function showTipMouse(e, s, col) {
+  updateInlineLabels(s, e.clientX);
+}
+
+// ── Touch (mobile) ────────────────────────────────────────────────────
 function showTipTouch(clientX, s, col) {
-  fillTooltip(s, col, clientX);
-  // CSS handles bottom-centre positioning on mobile
+  updateInlineLabels(s, clientX);
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────
