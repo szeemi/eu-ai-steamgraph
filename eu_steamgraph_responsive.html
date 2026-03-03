@@ -266,6 +266,12 @@ function buildBand(xs, hiY, loY) {
 const pathMap = {};
 let _xs, _cW, _W, _PL;
 
+// ── Format M value: show B when >= 1000M ──────────────────────────────
+function fmtM(m) {
+  if (m >= 1000) return (m / 1000).toFixed(1) + 'B';
+  return Math.round(m).toFixed(0) + 'M';
+}
+
 // ── Render ───────────────────────────────────────────────────────────
 function render() {
   const ns  = 'http://www.w3.org/2000/svg';
@@ -536,7 +542,7 @@ function updateInlineLabels(s, clientX) {
   YEARS.forEach((_,i) => {
     const el = document.getElementById(`lbl-val-${i}`);
     if (el) {
-      el.textContent = s.vals[i].toFixed(0)+'M';
+      el.textContent = fmtM(s.vals[i]);
       el.setAttribute('fill','#222');
     }
   });
