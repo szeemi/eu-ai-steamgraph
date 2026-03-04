@@ -52,7 +52,7 @@ h1 {
 }
 h1 .trail { text-decoration: none; }
 .subtitle {
-  font-size: clamp(15px,2vw,14px);
+  font-size: clamp(19px,2.6vw,18px);
   font-style: italic; color: var(--grey); line-height: 1.5; max-width: 320px; margin-top: 12px;
 }
 .yblock {
@@ -338,7 +338,7 @@ function render() {
     path.setAttribute('fill', col);
     path.setAttribute('stroke','#fff');
     path.setAttribute('stroke-width', mb ? '0.5' : '0.7');
-    path.style.opacity    = '0.92';
+    path.style.opacity    = '1';
     path.style.cursor     = 'pointer';
     path.style.transition = 'opacity .18s';
 
@@ -442,7 +442,7 @@ function render() {
     txt.setAttribute('font-size', fs);
     txt.setAttribute('font-weight','700');
     txt.setAttribute('fill', textCol);
-    txt.setAttribute('opacity','0.92');
+    txt.setAttribute('opacity','1');
     txt.setAttribute('pointer-events','none');
     txt.setAttribute('transform',`translate(${labelX.toFixed(1)},${midAt.toFixed(1)}) rotate(${ang.toFixed(2)})`);
     txt.textContent = dispName;
@@ -519,7 +519,7 @@ function setActive(cat) {
   });
 }
 function clearActive() {
-  Object.values(pathMap).forEach(p => { p.style.opacity='0.92'; });
+  Object.values(pathMap).forEach(p => { p.style.opacity='1'; });
   // Restore header label and year totals
   const hdr = document.getElementById('lbl-hdr');
   if (hdr) {
