@@ -359,30 +359,50 @@ function render() {
   // ── Global SVG touch handler — enables sliding between bands ──────
   // touchmove always fires on the element where touch started, so we use
   // elementFromPoint to find the actual band under the finger.
-  function handleSvgTouch(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    // Temporarily hide pointer-events to find element underneath
+  // touchStartedOnBand tracks whether the gesture began on a stream band;
+  // only then do we preventDefault (to suppress scroll while scrubbing).
+  let touchStartedOnBand = false;
+
+  function bandFromTouch(touch) {
     const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    // Walk up to find the path element
     let target = el;
     while (target && target !== svg) {
-      if (target._streamCat) {
-        const s   = target._streamCat;
-        const col = target._streamCol;
-        setActive(s.cat);
-        updateInlineLabels(s, touch.clientX);
-        return;
-      }
+      if (target._streamCat) return target;
       target = target.parentElement;
     }
-    // Finger moved off all bands — clear
-    clearActive();
+    return null;
   }
 
-  svg.addEventListener('touchstart', handleSvgTouch, {passive:false});
-  svg.addEventListener('touchmove',  handleSvgTouch, {passive:false});
-  svg.addEventListener('touchend',   () => { clearActive(); }, {passive:false});
+  svg.addEventListener('touchstart', e => {
+    const touch = e.touches[0];
+    const band = bandFromTouch(touch);
+    if (band) {
+      touchStartedOnBand = true;
+      e.preventDefault(); // suppress scroll only when starting on a band
+      setActive(band._streamCat.cat);
+      updateInlineLabels(band._streamCat, touch.clientX);
+    } else {
+      touchStartedOnBand = false;
+    }
+  }, {passive: false});
+
+  svg.addEventListener('touchmove', e => {
+    if (!touchStartedOnBand) return; // let scroll happen freely
+    e.preventDefault();
+    const touch = e.touches[0];
+    const band = bandFromTouch(touch);
+    if (band) {
+      setActive(band._streamCat.cat);
+      updateInlineLabels(band._streamCat, touch.clientX);
+    } else {
+      clearActive();
+    }
+  }, {passive: false});
+
+  svg.addEventListener('touchend', () => {
+    touchStartedOnBand = false;
+    clearActive();
+  }, {passive: true});
 
   // ── 3. Category labels between 2022 and 2023 ─────────────────
   // Mobile: anchor near xs[0] + small inset so text grows right without
