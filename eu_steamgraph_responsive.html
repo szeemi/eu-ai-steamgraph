@@ -52,7 +52,7 @@ h1 {
 }
 h1 .trail { text-decoration: none; }
 .subtitle {
-  font-size: clamp(19px,2.6vw,18px);
+  font-size: clamp(16px,2.6vw,18px);
   font-style: italic; color: var(--grey); line-height: 1.5; max-width: 320px; margin-top: 12px;
 }
 .yblock {
@@ -294,7 +294,7 @@ function render() {
   // Font sizes
   const fHdr   = mb ? 10  : 9;   // "TOTAL PER YEAR" micro label
   const fTotal = mb ? 14  : 15;  // X.XB value
-  const fYear  = mb ? 18  : 13;  // year label
+  const fYear  = mb ? 14  : 16;  // year label
   const fLblMin= mb ? 7.5 : 7.5; // min category label font size
   const fLblMax= mb ? 12  : 13;  // max category label font size
   const fLblK  = mb ? 0.24: 0.26;// label font = bandH * fLblK
@@ -452,7 +452,7 @@ function render() {
   // ── 4. Axis labels — above and below tick lines ───────────────
   const gap = 7;
   // Larger fonts for header row
-  const fHdr2   = mb ? 12 : 13;   // "TOTAL PER YEAR" / subcategory label
+  const fHdr2   = mb ? 13 : 14;   // "TOTAL PER YEAR" / subcategory label
   const fTotal2 = mb ? 16 : 19;   // X.XB value
 
   YEARS.forEach((year, i) => {
